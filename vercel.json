@@ -11,5 +11,15 @@
       "src": "/(.*)",
       "dest": "api/index.py"
     }
-  ]
+  ],
+  "crons": [
+    {
+      "path": "/api/webhook",
+      "schedule": "*/5 * * * *"
+    }
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "DOMAIN": "ai.taagc.site"
+  }
 }
