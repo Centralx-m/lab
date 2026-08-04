@@ -3,173 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlimited AI Agent - TAAGC</title>
-    <meta property="og:title" content="Unlimited Autonomous AI Agent" />
-    <meta property="og:description" content="AI agent that can do ANY task in ANY domain" />
-    <meta property="og:url" content="https://ai.taagc.site" />
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <title>Unlimited AI Agent</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 900px;
+            padding: 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        h1 { font-size: 3rem; margin-bottom: 10px; }
+        h1 .icon { font-size: 3.5rem; }
+        .subtitle { color: #888; font-size: 1.2rem; margin-bottom: 20px; }
+        .domain { color: #00cc88; font-size: 1rem; margin-bottom: 30px; }
+        .status { 
+            display: inline-block;
+            padding: 8px 20px;
+            background: #00cc88;
+            color: #000;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .card .value { font-size: 2rem; font-weight: bold; color: #00cc88; }
+        .card .label { color: #888; font-size: 0.9rem; margin-top: 5px; }
+        .endpoints {
+            text-align: left;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .endpoints .item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .endpoints .method {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .method.get { background: #00cc88; color: #000; }
+        .method.post { background: #ffaa00; color: #000; }
+        .endpoints .path { color: #00cc88; }
+        .footer { margin-top: 30px; color: #555; font-size: 0.8rem; }
+        .footer a { color: #00cc88; text-decoration: none; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo">
-                <span class="icon">🤖</span>
-                <h1>Unlimited AI Agent</h1>
-            </div>
-            <p class="subtitle">Powered by TAAGC | Deployed on Vercel</p>
-            <div class="domain-badge">🌐 ai.taagc.site</div>
-            <div class="status-badge" id="statusBadge">● Online</div>
-        </header>
+        <h1><span class="icon">☢️</span><br>Unlimited AI Agent</h1>
+        <p class="subtitle">Powered by TAAGC | Deployed on Vercel</p>
+        <p class="domain">🌐 <a href="https://ai.taagc.site" style="color:#00cc88;text-decoration:none;">ai.taagc.site</a></p>
+        <div class="status">● Online & Running</div>
 
-        <!-- Stats Dashboard -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-value" id="statTasks">0</div>
-                <div class="stat-label">Tasks Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statDomains">14</div>
-                <div class="stat-label">Domains</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statMemory">0</div>
-                <div class="stat-label">Knowledge Items</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statSuccess">0%</div>
-                <div class="stat-label">Success Rate</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statBots">0</div>
-                <div class="stat-label">Bots Created</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statUptime">0s</div>
-                <div class="stat-label">Uptime</div>
-            </div>
-        </div>
-
-        <!-- Main Grid -->
         <div class="grid">
-            <!-- Status Card -->
             <div class="card">
-                <h2>📊 Agent Status</h2>
-                <div id="statusContainer">
-                    <div class="loading">Loading...</div>
-                </div>
+                <div class="value">14</div>
+                <div class="label">Domains</div>
             </div>
-
-            <!-- Tasks Card -->
             <div class="card">
-                <h2>📋 Recent Tasks</h2>
-                <div id="tasksContainer">
-                    <div class="loading">Loading...</div>
-                </div>
+                <div class="value">∞</div>
+                <div class="label">Capabilities</div>
+            </div>
+            <div class="card">
+                <div class="value">✓</div>
+                <div class="label">Self-Learning</div>
             </div>
         </div>
 
-        <!-- Process Task -->
-        <div class="card">
-            <h2>🚀 Process New Task</h2>
-            <div class="task-form">
-                <div class="form-group">
-                    <label for="taskInput">Task Description</label>
-                    <textarea id="taskInput" placeholder="Example: Analyze the current Bitcoin market and provide a trading recommendation"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="taskPriority">Priority</label>
-                        <select id="taskPriority">
-                            <option value="1">Low</option>
-                            <option value="3" selected>Medium</option>
-                            <option value="5">High</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDeadline">Deadline</label>
-                        <input type="date" id="taskDeadline">
-                    </div>
-                </div>
-                <button id="processBtn" onclick="processTask()">▶ Process Task</button>
+        <h2 style="color:#00cc88;margin:20px 0;">📡 API Endpoints</h2>
+        <div class="endpoints">
+            <div class="item">
+                <span class="method get">GET</span>
+                <span class="path">/api/status</span>
+                <span style="color:#888;">— Get agent status</span>
             </div>
-            <div id="taskResult"></div>
-        </div>
-
-        <!-- Create Bot -->
-        <div class="card">
-            <h2>🔧 Create New Bot</h2>
-            <div class="bot-form">
-                <div class="form-group">
-                    <label for="botRequirements">Bot Requirements</label>
-                    <textarea id="botRequirements" placeholder="Example: Trade cryptocurrencies using machine learning with risk management"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="botLocation">Deploy Location</label>
-                        <select id="botLocation">
-                            <option value="local">Local</option>
-                            <option value="cloud">Cloud</option>
-                            <option value="remote">Remote Server</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="botName">Bot Name</label>
-                        <input type="text" id="botName" placeholder="MyNewBot">
-                    </div>
-                </div>
-                <button id="createBotBtn" onclick="createBot()">🤖 Create Bot</button>
+            <div class="item">
+                <span class="method post">POST</span>
+                <span class="path">/api/task</span>
+                <span style="color:#888;">— Process a task</span>
             </div>
-            <div id="botResult"></div>
-        </div>
-
-        <!-- Learn from Text -->
-        <div class="card">
-            <h2>📖 Learn from Text</h2>
-            <div class="learn-form">
-                <div class="form-group">
-                    <label for="learnText">Text to Learn</label>
-                    <textarea id="learnText" placeholder="Paste text to learn from..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="learnCategory">Category</label>
-                        <select id="learnCategory">
-                            <option value="general">General</option>
-                            <option value="business">Business</option>
-                            <option value="finance">Finance</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="technology">Technology</option>
-                            <option value="legal">Legal</option>
-                            <option value="creative">Creative</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="learnSource">Source</label>
-                        <input type="text" id="learnSource" placeholder="Book name or URL">
-                    </div>
-                </div>
-                <button id="learnBtn" onclick="learnText()">📚 Learn</button>
+            <div class="item">
+                <span class="method get">GET</span>
+                <span class="path">/api/tasks</span>
+                <span style="color:#888;">— List all tasks</span>
             </div>
-            <div id="learnResult"></div>
-        </div>
-
-        <!-- Bots List -->
-        <div class="card">
-            <h2>🤖 Created Bots</h2>
-            <div id="botsContainer">
-                <div class="loading">No bots created yet</div>
+            <div class="item">
+                <span class="method post">POST</span>
+                <span class="path">/api/create_bot</span>
+                <span style="color:#888;">— Create a new bot</span>
+            </div>
+            <div class="item">
+                <span class="method post">POST</span>
+                <span class="path">/api/learn</span>
+                <span style="color:#888;">— Learn from text</span>
+            </div>
+            <div class="item">
+                <span class="method post">POST</span>
+                <span class="path">/api/replicate</span>
+                <span style="color:#888;">— Replicate the agent</span>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer>
+        <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;">
+            <h2 style="color:#00cc88;margin:10px 0;">🚀 Quick Test</h2>
+            <div style="width:100%;max-width:500px;">
+                <textarea id="testTask" rows="3" style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:1rem;resize:vertical;" placeholder="Enter a task..."></textarea>
+                <button onclick="processTask()" style="margin-top:10px;padding:12px 24px;border:none;border-radius:8px;background:#00cc88;color:#000;font-weight:bold;cursor:pointer;width:100%;font-size:1rem;">▶ Process Task</button>
+                <div id="result" style="margin-top:15px;padding:15px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);white-space:pre-wrap;font-family:monospace;font-size:0.85rem;max-height:200px;overflow-y:auto;display:none;"></div>
+            </div>
+        </div>
+
+        <div class="footer">
             <p>🤖 Unlimited Autonomous AI Agent — Any Task, Any Domain</p>
-            <p><a href="https://ai.taagc.site">ai.taagc.site</a> | © 2026 TAAGC</p>
-        </footer>
+            <p><a href="https://ai.taagc.site">ai.taagc.site</a> | &copy; 2026 TAAGC</p>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        async function processTask() {
+            const input = document.getElementById('testTask');
+            const result = document.getElementById('result');
+            const task = input.value.trim();
+            
+            if (!task) {
+                result.style.display = 'block';
+                result.innerHTML = '❌ Please enter a task';
+                return;
+            }
+            
+            result.style.display = 'block';
+            result.innerHTML = '⏳ Processing...';
+            
+            try {
+                const response = await fetch('/api/task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    result.innerHTML = `✅ Success!\n\n${JSON.stringify(data.result, null, 2)}`;
+                } else {
+                    result.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
 </body>
 </html>
