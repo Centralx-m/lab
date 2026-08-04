@@ -1,6 +1,7 @@
 [project]
 name = "unlimited-ai-agent"
 version = "1.0.0"
+description = "Unlimited Autonomous AI Agent - Any Task, Any Domain"
 requires-python = ">=3.9"
 dependencies = []
 
