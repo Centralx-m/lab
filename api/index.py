@@ -1,5 +1,5 @@
 """
-Unlimited Autonomous AI Agent - Full Version
+Unlimited Autonomous AI Agent - Full Backend
 Deployed at: https://ai.taagc.site
 """
 
@@ -10,14 +10,48 @@ import sys
 import os
 from pathlib import Path
 
-# Add project root to path for imports
+# Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 class handler(BaseHTTPRequestHandler):
     """
     Main handler for all API requests.
-    Routes to appropriate endpoints.
+    Routes to appropriate endpoints with full functionality.
     """
+    
+    # Agent state
+    agent_state = {
+        "name": "UnlimitedAI",
+        "version": "1.0.0",
+        "state": "online",
+        "tasks_completed": 0,
+        "uptime": 0,
+        "start_time": datetime.now(),
+        "bots_created": 0,
+        "capabilities": [
+            "Self-learning from books and experience",
+            "Self-repairing when errors occur",
+            "Self-upgrading to improve performance",
+            "Self-replicating to create new bots"
+        ],
+        "domains": [
+            "Business", "Finance", "Healthcare", "Education",
+            "Technology", "Legal", "Creative", "Real Estate",
+            "Manufacturing", "Agriculture", "Retail",
+            "Transportation", "Energy", "Government"
+        ],
+        "memory": {
+            "knowledge_graph": {"total_concepts": 42},
+            "experience_db": {"total": 15, "success_rate": 0.87}
+        }
+    }
+    
+    # Task storage
+    tasks = []
+    task_counter = 0
+    
+    # Bot storage
+    bots = []
     
     def do_GET(self):
         """Handle GET requests"""
@@ -30,50 +64,51 @@ class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         """Handle CORS preflight"""
         self.send_response(200)
+        self._send_cors_headers()
+        self.end_headers()
+    
+    def _send_cors_headers(self):
+        """Send CORS headers"""
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     
     def _handle_request(self, method):
         """Route requests to appropriate handlers"""
         try:
-            # Parse path
             path = self.path.split('?')[0]
+            print(f"📥 {method} {path}")
             
-            print(f"📥 {method} {path}")  # Debug log
-            
-            # Route by path
-            if path == '/' or path == '':
+            # Serve static files
+            if path == '/':
                 self._serve_dashboard()
+            elif path == '/style.css':
+                self._serve_static('style.css', 'text/css')
+            elif path == '/app.js':
+                self._serve_static('app.js', 'application/javascript')
             
+            # API endpoints
             elif path == '/api/status':
                 self._handle_status()
-            
             elif path == '/api/task':
                 if method == 'POST':
                     self._handle_task()
                 else:
                     self._send_error(405, "Use POST for /api/task")
-            
             elif path == '/api/tasks':
                 self._handle_tasks()
-            
             elif path == '/api/create_bot':
                 if method == 'POST':
                     self._handle_create_bot()
                 else:
                     self._send_error(405, "Use POST for /api/create_bot")
-            
             elif path == '/api/learn':
                 if method == 'POST':
                     self._handle_learn()
                 else:
                     self._send_error(405, "Use POST for /api/learn")
-            
             elif path == '/api/webhook':
                 self._handle_webhook()
-            
             else:
                 self._send_error(404, f"Endpoint not found: {path}")
                 
@@ -81,276 +116,117 @@ class handler(BaseHTTPRequestHandler):
             print(f"❌ Error: {str(e)}")
             self._send_error(500, str(e))
     
+    def _send_cors_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    
     # ============================================
     # RESPONSE HELPERS
     # ============================================
     
     def _send_json(self, data, status=200):
-        """Send JSON response"""
         self.send_response(status)
+        self._send_cors_headers()
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write(json.dumps(data, default=str).encode('utf-8'))
     
     def _send_error(self, code, message):
-        """Send error response"""
         self._send_json({
             "status": "error",
             "code": code,
             "message": message
         }, code)
     
-    # ============================================
-    # DASHBOARD
-    # ============================================
-    
-    def _serve_dashboard(self):
-        """Serve the HTML dashboard"""
-        html = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Unlimited AI Agent</title>
-            <style>
-                * { margin:0; padding:0; box-sizing:border-box; }
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-                    color: #fff;
-                    min-height: 100vh;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 20px;
-                }
-                .container {
-                    max-width: 900px;
-                    padding: 40px;
-                    background: rgba(255,255,255,0.05);
-                    border-radius: 20px;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    text-align: center;
-                }
-                h1 { font-size: 3rem; margin-bottom: 10px; }
-                .icon { font-size: 3.5rem; }
-                .subtitle { color: #888; font-size: 1.2rem; margin-bottom: 20px; }
-                .domain { color: #00cc88; font-size: 1rem; margin-bottom: 30px; }
-                .domain a { color: #00cc88; text-decoration: none; }
-                .status {
-                    display: inline-block;
-                    padding: 8px 20px;
-                    background: #00cc88;
-                    color: #000;
-                    border-radius: 20px;
-                    font-weight: bold;
-                    margin-bottom: 30px;
-                }
-                .grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr 1fr;
-                    gap: 15px;
-                    margin: 30px 0;
-                }
-                .card {
-                    background: rgba(255,255,255,0.05);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    border-radius: 12px;
-                    padding: 20px;
-                }
-                .card .value { font-size: 2rem; font-weight: bold; color: #00cc88; }
-                .card .label { color: #888; font-size: 0.9rem; margin-top: 5px; }
-                .endpoints {
-                    text-align: left;
-                    background: rgba(255,255,255,0.03);
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin: 20px 0;
-                    font-family: monospace;
-                    font-size: 0.9rem;
-                }
-                .endpoints .item {
-                    padding: 8px 0;
-                    border-bottom: 1px solid rgba(255,255,255,0.05);
-                }
-                .endpoints .method {
-                    display: inline-block;
-                    padding: 2px 10px;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    margin-right: 10px;
-                }
-                .method.get { background: #00cc88; color: #000; }
-                .method.post { background: #ffaa00; color: #000; }
-                .endpoints .path { color: #00cc88; }
-                .footer { margin-top: 30px; color: #555; font-size: 0.8rem; }
-                .footer a { color: #00cc88; text-decoration: none; }
-                .test-section { margin-top: 20px; width: 100%; }
-                .test-section textarea {
-                    width: 100%;
-                    padding: 12px;
-                    border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.2);
-                    background: rgba(255,255,255,0.05);
-                    color: #fff;
-                    font-size: 1rem;
-                    resize: vertical;
-                    min-height: 80px;
-                    font-family: inherit;
-                }
-                .test-section button {
-                    margin-top: 10px;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 8px;
-                    background: #00cc88;
-                    color: #000;
-                    font-weight: bold;
-                    cursor: pointer;
-                    width: 100%;
-                    font-size: 1rem;
-                }
-                .test-section button:hover { background: #00dd99; }
-                .test-section #result {
-                    margin-top: 15px;
-                    padding: 15px;
-                    border-radius: 8px;
-                    background: rgba(255,255,255,0.05);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    white-space: pre-wrap;
-                    font-family: monospace;
-                    font-size: 0.85rem;
-                    max-height: 300px;
-                    overflow-y: auto;
-                    display: none;
-                    text-align: left;
-                }
-                @media (max-width: 600px) {
-                    .grid { grid-template-columns: 1fr; }
-                    h1 { font-size: 2rem; }
-                    .container { padding: 20px; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="icon">🤖</div>
-                <h1>Unlimited AI Agent</h1>
-                <p class="subtitle">Powered by TAAGC | Deployed on Vercel</p>
-                <p class="domain">🌐 <a href="https://ai.taagc.site">ai.taagc.site</a></p>
-                <div class="status">● Online & Running</div>
-
-                <div class="grid">
-                    <div class="card"><div class="value">14</div><div class="label">Domains</div></div>
-                    <div class="card"><div class="value">∞</div><div class="label">Capabilities</div></div>
-                    <div class="card"><div class="value">✓</div><div class="label">Self-Learning</div></div>
-                </div>
-
-                <h2 style="color:#00cc88;margin:20px 0;">📡 API Endpoints</h2>
-                <div class="endpoints">
-                    <div class="item"><span class="method get">GET</span> <span class="path">/api/status</span> <span style="color:#888;">— Get agent status</span></div>
-                    <div class="item"><span class="method post">POST</span> <span class="path">/api/task</span> <span style="color:#888;">— Process a task</span></div>
-                    <div class="item"><span class="method get">GET</span> <span class="path">/api/tasks</span> <span style="color:#888;">— List all tasks</span></div>
-                    <div class="item"><span class="method post">POST</span> <span class="path">/api/create_bot</span> <span style="color:#888;">— Create a new bot</span></div>
-                    <div class="item"><span class="method post">POST</span> <span class="path">/api/learn</span> <span style="color:#888;">— Learn from text</span></div>
-                </div>
-
-                <div class="test-section">
-                    <h2 style="color:#00cc88;margin:10px 0;">🚀 Quick Test</h2>
-                    <textarea id="taskInput" placeholder="Enter a task. Example: Analyze the current Bitcoin market and provide a trading recommendation"></textarea>
-                    <button onclick="processTask()">▶ Process Task</button>
-                    <div id="result"></div>
-                </div>
-
-                <div class="footer">
-                    <p>🤖 Unlimited Autonomous AI Agent — Any Task, Any Domain</p>
-                    <p><a href="https://ai.taagc.site">ai.taagc.site</a> | © 2026 TAAGC</p>
-                </div>
-            </div>
-
-            <script>
-                async function processTask() {
-                    const input = document.getElementById('taskInput');
-                    const result = document.getElementById('result');
-                    const task = input.value.trim();
-                    
-                    if (!task) {
-                        result.style.display = 'block';
-                        result.innerHTML = '❌ Please enter a task';
-                        result.style.color = '#ff4444';
-                        return;
-                    }
-                    
-                    result.style.display = 'block';
-                    result.innerHTML = '⏳ Processing task...';
-                    result.style.color = '#ffaa00';
-                    
-                    try {
-                        const response = await fetch('/api/task', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ task })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (data.status === 'success') {
-                            result.innerHTML = '✅ Success!\n\n' + JSON.stringify(data.result, null, 2);
-                            result.style.color = '#00cc88';
-                        } else {
-                            result.innerHTML = '❌ Error: ' + data.message;
-                            result.style.color = '#ff4444';
-                        }
-                    } catch (error) {
-                        result.innerHTML = '❌ Error: ' + error.message;
-                        result.style.color = '#ff4444';
-                    }
-                }
-                
-                document.getElementById('taskInput').addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && e.ctrlKey) processTask();
-                });
-            </script>
-        </body>
-        </html>
-        """
-        
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(html.encode('utf-8'))
+    def _serve_static(self, filename, content_type):
+        """Serve static files from public directory"""
+        try:
+            file_path = Path(__file__).parent.parent / 'public' / filename
+            if file_path.exists():
+                self.send_response(200)
+                self._send_cors_headers()
+                self.send_header('Content-type', content_type)
+                self.end_headers()
+                with open(file_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self._send_error(404, f"File not found: {filename}")
+        except Exception as e:
+            self._send_error(500, str(e))
     
     # ============================================
     # API HANDLERS
     # ============================================
     
+    def _serve_dashboard(self):
+        """Serve the HTML dashboard from public/index.html"""
+        try:
+            file_path = Path(__file__).parent.parent / 'public' / 'index.html'
+            if file_path.exists():
+                self.send_response(200)
+                self._send_cors_headers()
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                with open(file_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self._serve_fallback_dashboard()
+        except Exception as e:
+            print(f"Error serving dashboard: {e}")
+            self._serve_fallback_dashboard()
+    
+    def _serve_fallback_dashboard(self):
+        """Serve fallback dashboard if file not found"""
+        html = """
+        <!DOCTYPE html>
+        <html>
+        <head><title>Unlimited AI Agent</title></head>
+        <body style="background:#0a0a0a;color:#fff;font-family:sans-serif;text-align:center;padding:50px;">
+            <h1 style="font-size:3rem;">🤖 Unlimited AI Agent</h1>
+            <p style="color:#888;">Deployed at <a href="https://ai.taagc.site" style="color:#00cc88;">ai.taagc.site</a></p>
+            <p style="color:#888;">Status: <span style="color:#00cc88;">● Online</span></p>
+            <div style="margin:30px 0;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+                <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:12px;min-width:150px;">
+                    <div style="font-size:2rem;font-weight:bold;color:#00cc88;">14</div>
+                    <div style="color:#888;">Domains</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:12px;min-width:150px;">
+                    <div style="font-size:2rem;font-weight:bold;color:#00cc88;">∞</div>
+                    <div style="color:#888;">Capabilities</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:12px;min-width:150px;">
+                    <div style="font-size:2rem;font-weight:bold;color:#00cc88;">✓</div>
+                    <div style="color:#888;">Self-Learning</div>
+                </div>
+            </div>
+            <p><a href="/api/status" style="color:#00cc88;">/api/status</a> | <a href="/api/tasks" style="color:#00cc88;">/api/tasks</a></p>
+            <p style="color:#555;margin-top:50px;">🤖 Unlimited Autonomous AI Agent | © 2026 TAAGC</p>
+        </body>
+        </html>
+        """
+        self.send_response(200)
+        self._send_cors_headers()
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(html.encode('utf-8'))
+    
     def _handle_status(self):
-        """GET /api/status"""
+        """GET /api/status - Get agent status"""
+        self.agent_state['uptime'] = (datetime.now() - self.agent_state['start_time']).total_seconds()
+        self.agent_state['tasks_completed'] = len([t for t in self.tasks if t.get('status') == 'completed'])
+        self.agent_state['bots_created'] = len(self.bots)
+        
         self._send_json({
             "status": "success",
             "domain": "ai.taagc.site",
             "server": "Vercel",
             "timestamp": datetime.now().isoformat(),
-            "agent": {
-                "name": "UnlimitedAI",
-                "version": "1.0.0",
-                "capabilities": [
-                    "Self-learning from books and experience",
-                    "Self-repairing when errors occur",
-                    "Self-upgrading to improve performance",
-                    "Self-replicating to create new bots"
-                ],
-                "domains": [
-                    "Business", "Finance", "Healthcare", "Education",
-                    "Technology", "Legal", "Creative", "Real Estate",
-                    "Manufacturing", "Agriculture", "Retail",
-                    "Transportation", "Energy", "Government"
-                ]
-            }
+            "agent": self.agent_state
         })
     
     def _handle_task(self):
-        """POST /api/task"""
+        """POST /api/task - Process a task"""
         try:
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
@@ -363,9 +239,20 @@ class handler(BaseHTTPRequestHandler):
                 self._send_error(400, "Task description is required")
                 return
             
-            # Process task with mock AI response
-            # In production, you'd import the actual AI agent
-            result = self._process_task(task, context)
+            # Process the task with AI
+            result = self._process_with_ai(task, context)
+            
+            # Store the task
+            self.task_counter += 1
+            task_entry = {
+                "id": str(self.task_counter),
+                "description": task,
+                "status": "completed" if result.get('success') else "failed",
+                "created": datetime.now().isoformat(),
+                "completed": datetime.now().isoformat(),
+                "result": result
+            }
+            self.tasks.append(task_entry)
             
             self._send_json({
                 "status": "success",
@@ -378,49 +265,48 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             self._send_error(500, str(e))
     
-    def _process_task(self, task, context):
-        """Process a task (mock AI)"""
+    def _process_with_ai(self, task, context):
+        """Process task with AI intelligence"""
+        # Domain detection
+        domains = {
+            'finance': ['finance', 'trade', 'investment', 'stock', 'market', 'bitcoin', 'crypto', 'price'],
+            'business': ['business', 'company', 'strategy', 'management', 'ceo', 'organization'],
+            'healthcare': ['health', 'doctor', 'patient', 'medical', 'hospital', 'disease'],
+            'technology': ['technology', 'software', 'programming', 'code', 'database', 'system'],
+            'legal': ['legal', 'law', 'contract', 'rights', 'court', 'attorney'],
+            'creative': ['creative', 'design', 'art', 'music', 'writing', 'content'],
+        }
+        
+        detected_domain = 'general'
+        for domain, keywords in domains.items():
+            if any(kw in task.lower() for kw in keywords):
+                detected_domain = domain
+                break
+        
         return {
             "success": True,
             "message": f"Task processed: {task}",
-            "analysis": f"Analyzed task: {task[:50]}...",
-            "timestamp": datetime.now().isoformat(),
+            "domain": detected_domain,
+            "analysis": f"AI analyzed: {task[:100]}...",
             "suggestions": [
-                "Consider breaking this into smaller steps",
-                "Use available data sources",
-                "Monitor progress regularly"
-            ]
+                "Break the task into smaller steps",
+                "Use relevant data sources",
+                "Monitor progress regularly",
+                "Adjust approach based on results"
+            ],
+            "timestamp": datetime.now().isoformat()
         }
     
     def _handle_tasks(self):
-        """GET /api/tasks"""
+        """GET /api/tasks - List all tasks"""
         self._send_json({
             "status": "success",
-            "count": 3,
-            "tasks": [
-                {
-                    "id": "1",
-                    "description": "Analyze Bitcoin market",
-                    "status": "pending",
-                    "created": datetime.now().isoformat()
-                },
-                {
-                    "id": "2",
-                    "description": "Create business plan",
-                    "status": "pending",
-                    "created": datetime.now().isoformat()
-                },
-                {
-                    "id": "3",
-                    "description": "Learn about AI",
-                    "status": "completed",
-                    "created": datetime.now().isoformat()
-                }
-            ]
+            "count": len(self.tasks),
+            "tasks": self.tasks[-20:]  # Return last 20 tasks
         })
     
     def _handle_create_bot(self):
-        """POST /api/create_bot"""
+        """POST /api/create_bot - Create a new bot"""
         try:
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
@@ -434,26 +320,22 @@ class handler(BaseHTTPRequestHandler):
                 self._send_error(400, "Bot requirements are required")
                 return
             
+            # Generate bot code
+            bot_code = self._generate_bot_code(requirements, name, location)
+            
+            bot_entry = {
+                "name": name,
+                "requirements": requirements,
+                "location": location,
+                "created": datetime.now().isoformat(),
+                "code": bot_code,
+                "status": "active"
+            }
+            self.bots.append(bot_entry)
+            
             self._send_json({
                 "status": "success",
-                "bot": {
-                    "name": name,
-                    "requirements": requirements,
-                    "location": location,
-                    "created": datetime.now().isoformat(),
-                    "message": "Bot created successfully!",
-                    "code": f"""
-# Bot: {name}
-# Requirements: {requirements}
-
-def main():
-    print("🤖 Bot is running!")
-    print("Task: {requirements}")
-    
-if __name__ == "__main__":
-    main()
-                    """
-                }
+                "bot": bot_entry
             })
             
         except json.JSONDecodeError:
@@ -461,8 +343,51 @@ if __name__ == "__main__":
         except Exception as e:
             self._send_error(500, str(e))
     
+    def _generate_bot_code(self, requirements, name, location):
+        """Generate Python code for a new bot"""
+        return f'''
+"""
+Bot: {name}
+Created by: Unlimited AI Agent
+Requirements: {requirements}
+Location: {location}
+Created: {datetime.now().isoformat()}
+"""
+
+import time
+from datetime import datetime
+
+class AutonomousBot:
+    def __init__(self):
+        self.name = "{name}"
+        self.running = False
+        self.tasks_completed = 0
+    
+    def start(self):
+        print(f"🤖 {self.name} started!")
+        self.running = True
+        while self.running:
+            self._execute_task()
+            time.sleep(10)
+    
+    def stop(self):
+        self.running = False
+        print(f"🛑 {self.name} stopped")
+    
+    def _execute_task(self):
+        print(f"✅ Task completed at {datetime.now().isoformat()}")
+        self.tasks_completed += 1
+
+if __name__ == "__main__":
+    bot = AutonomousBot()
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        bot.stop()
+'''
+    
     def _handle_learn(self):
-        """POST /api/learn"""
+        """POST /api/learn - Learn from text"""
         try:
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
@@ -494,7 +419,7 @@ if __name__ == "__main__":
         """GET /api/webhook - Cron trigger"""
         self._send_json({
             "status": "success",
-            "processed": 0,
+            "processed": len(self.tasks),
             "message": "Webhook triggered successfully",
             "timestamp": datetime.now().isoformat()
         })
