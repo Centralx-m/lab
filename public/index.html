@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlimited AI Agent - TAAGC</title>
+    <meta property="og:title" content="Unlimited Autonomous AI Agent" />
+    <meta property="og:description" content="AI agent that can do ANY task in ANY domain" />
+    <meta property="og:url" content="https://ai.taagc.site" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <span class="icon">🤖</span>
+                <h1>Unlimited AI Agent</h1>
+            </div>
+            <p class="subtitle">Powered by TAAGC | Deployed on Vercel</p>
+            <div class="domain-badge">🌐 ai.taagc.site</div>
+            <div class="status-badge" id="statusBadge">● Online</div>
+        </header>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="statTasks">0</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statDomains">14</div>
+                <div class="stat-label">Domains</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statMemory">0</div>
+                <div class="stat-label">Knowledge Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statSuccess">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statBots">0</div>
+                <div class="stat-label">Bots Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statUptime">0s</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- Status Card -->
+            <div class="card">
+                <h2>📊 Agent Status</h2>
+                <div id="statusContainer">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Tasks Card -->
+            <div class="card">
+                <h2>📋 Recent Tasks</h2>
+                <div id="tasksContainer">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Task -->
+        <div class="card">
+            <h2>🚀 Process New Task</h2>
+            <div class="task-form">
+                <div class="form-group">
+                    <label for="taskInput">Task Description</label>
+                    <textarea id="taskInput" placeholder="Example: Analyze the current Bitcoin market and provide a trading recommendation"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority">
+                            <option value="1">Low</option>
+                            <option value="3" selected>Medium</option>
+                            <option value="5">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDeadline">Deadline</label>
+                        <input type="date" id="taskDeadline">
+                    </div>
+                </div>
+                <button id="processBtn" onclick="processTask()">▶ Process Task</button>
+            </div>
+            <div id="taskResult"></div>
+        </div>
+
+        <!-- Create Bot -->
+        <div class="card">
+            <h2>🔧 Create New Bot</h2>
+            <div class="bot-form">
+                <div class="form-group">
+                    <label for="botRequirements">Bot Requirements</label>
+                    <textarea id="botRequirements" placeholder="Example: Trade cryptocurrencies using machine learning with risk management"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="botLocation">Deploy Location</label>
+                        <select id="botLocation">
+                            <option value="local">Local</option>
+                            <option value="cloud">Cloud</option>
+                            <option value="remote">Remote Server</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="botName">Bot Name</label>
+                        <input type="text" id="botName" placeholder="MyNewBot">
+                    </div>
+                </div>
+                <button id="createBotBtn" onclick="createBot()">🤖 Create Bot</button>
+            </div>
+            <div id="botResult"></div>
+        </div>
+
+        <!-- Learn from Text -->
+        <div class="card">
+            <h2>📖 Learn from Text</h2>
+            <div class="learn-form">
+                <div class="form-group">
+                    <label for="learnText">Text to Learn</label>
+                    <textarea id="learnText" placeholder="Paste text to learn from..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="learnCategory">Category</label>
+                        <select id="learnCategory">
+                            <option value="general">General</option>
+                            <option value="business">Business</option>
+                            <option value="finance">Finance</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="technology">Technology</option>
+                            <option value="legal">Legal</option>
+                            <option value="creative">Creative</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="learnSource">Source</label>
+                        <input type="text" id="learnSource" placeholder="Book name or URL">
+                    </div>
+                </div>
+                <button id="learnBtn" onclick="learnText()">📚 Learn</button>
+            </div>
+            <div id="learnResult"></div>
+        </div>
+
+        <!-- Bots List -->
+        <div class="card">
+            <h2>🤖 Created Bots</h2>
+            <div id="botsContainer">
+                <div class="loading">No bots created yet</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>🤖 Unlimited Autonomous AI Agent — Any Task, Any Domain</p>
+            <p><a href="https://ai.taagc.site">ai.taagc.site</a> | © 2026 TAAGC</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
